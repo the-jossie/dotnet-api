@@ -73,4 +73,29 @@ public class UserController : ControllerBase
         throw new Exception("Failed to Update User");
     }
 
+    [HttpPost]
+    public IActionResult AddUser(User user)
+    {
+        string sql = @"
+            INSERT INTO TutorialAppSchema.Users(
+                [FirstName],
+                [LastName],
+                [Email],
+                [Gender],
+                [Active]
+            ) VALUES(
+                '" + user.FirstName +
+                "', '" + user.LastName +
+                "', '" + user.Email +
+                "', '" + user.Gender +
+                "', '" + user.Active +
+            "')";
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Add User");
+    }
 }
