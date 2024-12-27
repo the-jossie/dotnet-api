@@ -51,4 +51,26 @@ public class UserController : ControllerBase
 
         return user;
     }
+
+    [HttpPut]
+    public IActionResult EditUser(User user)
+    {
+
+        string sql = @"
+            UPDATE TutorialAppSchema.Users
+            SET [FirstName] = '" + user.FirstName +
+            "', [LastName] = '" + user.LastName +
+            "', [Email] = '" + user.Email +
+            "', [Gender] = '" + user.Gender +
+            "', [Active] = '" + user.Active +
+            "' WHERE UserId = " + user.UserId.ToString();
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Update User");
+    }
+
 }
