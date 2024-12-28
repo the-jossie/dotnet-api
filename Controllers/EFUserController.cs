@@ -11,9 +11,15 @@ namespace Api_Tutorial.Controllers;
 public class EFUserController : ControllerBase
 {
     EFDataContext _entityFramework;
+    IMapper _mapper;
     public EFUserController(IConfiguration config)
     {
         _entityFramework = new EFDataContext(config);
+
+        _mapper = new Mapper(new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<UserDto, User>();
+        }));
     }
 
     [HttpGet("")]
@@ -64,7 +70,7 @@ public class EFUserController : ControllerBase
     [HttpPost]
     public IActionResult AddUser(UserDto user)
     {
-        User? userFromDb = new User();
+        User? userFromDb = _mapper.Map<User>(user);
 
         _entityFramework.Add(userFromDb);
 
