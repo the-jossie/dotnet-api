@@ -53,7 +53,29 @@ namespace Api_Tutorial.Controllers
 
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParameters))
                     {
-                        return Ok(new { message = "User created successfully" });
+
+                        string sqlAddUser = @"
+                            INSERT INTO TutorialAppSchema.Users(
+                                [FirstName],
+                                [LastName],
+                                [Email],
+                                [Gender],
+                                [Active]
+                            ) VALUES(
+                                '" + registrationDto.FirstName +
+                                "', '" + registrationDto.LastName +
+                                "', '" + registrationDto.Email +
+                                "', '" + registrationDto.Gender +
+                                "', 1)";
+
+                        if (_dapper.ExecuteSql(sqlAddUser))
+                        {
+                            return Ok(new { message = "User created successfully" });
+                        }
+                        else
+                        {
+                            return BadRequest(new { message = "Failed to add user" });
+                        }
                     }
                     else
                     {
