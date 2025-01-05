@@ -116,4 +116,17 @@ public class EFUserController : ControllerBase
 
         throw new Exception("Failed to Get User Salary");
     }
+
+    [HttpPost("salary")]
+    public IActionResult AddUserSalary(UserSalary userSalary)
+    {
+        _entityFramework.UserSalary.Add(userSalary);
+
+        if (_entityFramework.SaveChanges() > 0)
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Add User Salary");
+    }
 }
