@@ -168,4 +168,21 @@ public class UserController : ControllerBase
 
         throw new Exception("Failed to Update User Salary");
     }
+
+    [HttpDelete("salary/{userId}")]
+    public IActionResult DeleteUserSalary(int userId)
+    {
+
+        string sql = @"
+            DELETE FROM TutorialAppSchema.UserSalary
+            WHERE UserId = " + userId.ToString()
+        ;
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Delete User Salary");
+    }
 }
