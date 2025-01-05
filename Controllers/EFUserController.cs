@@ -129,4 +129,24 @@ public class EFUserController : ControllerBase
 
         throw new Exception("Failed to Add User Salary");
     }
+
+    [HttpPut("salary")]
+    public IActionResult EditUserSalary(UserSalary userSalary)
+    {
+        UserSalary? userSalaryFromDb = _entityFramework.UserSalary.Where(u => u.UserId == userSalary.UserId).FirstOrDefault<UserSalary>();
+
+        if (userSalaryFromDb != null)
+        {
+            userSalaryFromDb.Salary = userSalary.Salary;
+
+            if (_entityFramework.SaveChanges() > 0)
+            {
+                return Ok();
+            }
+
+            throw new Exception("Failed to Update User Salary");
+        }
+
+        throw new Exception("Failed to Update User Salary");
+    }
 }
