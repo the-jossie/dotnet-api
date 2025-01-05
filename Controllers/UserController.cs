@@ -117,4 +117,19 @@ public class UserController : ControllerBase
 
         throw new Exception("Failed to Delete User");
     }
+
+    [HttpGet("salary/{userId}")]
+    public UserSalary GetUserSalary(int userId)
+    {
+
+        string sql = @"
+            SELECT [UserId],
+                [Salary]
+            FROM TutorialAppSchema.UserSalary
+            WHERE UserId = " + userId.ToString();
+
+        UserSalary userSalary = _dapper.LoadSingleData<UserSalary>(sql);
+
+        return userSalary;
+    }
 }
