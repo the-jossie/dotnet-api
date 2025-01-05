@@ -103,4 +103,17 @@ public class EFUserController : ControllerBase
 
         throw new Exception("Failed to Delete User");
     }
+
+    [HttpGet("salary/{userId}")]
+    public UserSalary GetUserSalary(int userId)
+    {
+        UserSalary? userSalary = _entityFramework.UserSalary.Where(u => u.UserId == userId).FirstOrDefault<UserSalary>();
+
+        if (userSalary != null)
+        {
+            return userSalary;
+        }
+
+        throw new Exception("Failed to Get User Salary");
+    }
 }
