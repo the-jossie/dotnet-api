@@ -149,4 +149,24 @@ public class EFUserController : ControllerBase
 
         throw new Exception("Failed to Update User Salary");
     }
+
+    [HttpDelete("salary/{userId}")]
+    public IActionResult DeleteUserSalary(int userId)
+    {
+        UserSalary? userSalaryFromDb = _entityFramework.UserSalary.Where(u => u.UserId == userId).FirstOrDefault<UserSalary>();
+
+        if (userSalaryFromDb != null)
+        {
+            _entityFramework.UserSalary.Remove(userSalaryFromDb);
+
+            if (_entityFramework.SaveChanges() > 0)
+            {
+                return Ok();
+            }
+
+            throw new Exception("Failed to Delete User Salary");
+        }
+
+        throw new Exception("Failed to Delete User Salary");
+    }
 }
