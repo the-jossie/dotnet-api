@@ -11,10 +11,13 @@ namespace Api_Tutorial.Controllers;
 public class EFUserController : ControllerBase
 {
     EFDataContext _entityFramework;
+    IUserRepository _userRepository;
     IMapper _mapper;
-    public EFUserController(IConfiguration config)
+    public EFUserController(IConfiguration config, IUserRepository userRepository)
     {
         _entityFramework = new EFDataContext(config);
+
+        _userRepository = userRepository;
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
         {
@@ -56,7 +59,7 @@ public class EFUserController : ControllerBase
             userFromDb.LastName = user.LastName;
             userFromDb.Gender = user.Gender;
 
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
@@ -72,9 +75,9 @@ public class EFUserController : ControllerBase
     {
         User? userFromDb = _mapper.Map<User>(user);
 
-        _entityFramework.Add(userFromDb);
+        _userRepository.AddEntity<User>(userFromDb);
 
-        if (_entityFramework.SaveChanges() > 0)
+        if (_userRepository.SaveChanges())
         {
             return Ok();
         }
@@ -91,9 +94,9 @@ public class EFUserController : ControllerBase
 
         if (userFromDb != null)
         {
-            _entityFramework.Users.Remove(userFromDb);
+            _userRepository.RemoveEntity<User>(userFromDb);
 
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
@@ -120,9 +123,9 @@ public class EFUserController : ControllerBase
     [HttpPost("salary")]
     public IActionResult AddUserSalary(UserSalary userSalary)
     {
-        _entityFramework.UserSalary.Add(userSalary);
+        _userRepository.AddEntity<UserSalary>(userSalary);
 
-        if (_entityFramework.SaveChanges() > 0)
+        if (_userRepository.SaveChanges())
         {
             return Ok();
         }
@@ -139,7 +142,7 @@ public class EFUserController : ControllerBase
         {
             userSalaryFromDb.Salary = userSalary.Salary;
 
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
@@ -157,9 +160,9 @@ public class EFUserController : ControllerBase
 
         if (userSalaryFromDb != null)
         {
-            _entityFramework.UserSalary.Remove(userSalaryFromDb);
+            _userRepository.RemoveEntity<UserSalary>(userSalaryFromDb);
 
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
