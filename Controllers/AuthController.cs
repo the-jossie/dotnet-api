@@ -37,17 +37,9 @@ namespace Api_Tutorial.Controllers
                         rng.GetNonZeroBytes(passwordSalt);
                     }
 
-                    string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value + Convert.ToBase64String(passwordSalt);
+                    byte[] passwordHash = GetPasswordHash(registrationDto.Password, passwordSalt);
 
-                    byte[] passwordHash = KeyDerivation.Pbkdf2(
-                        password: registrationDto.Password,
-                        salt: Encoding.ASCII.GetBytes(passwordSaltPlusString),
-                        prf: KeyDerivationPrf.HMACSHA1,
-                        iterationCount: 100000,
-                        numBytesRequested: 256 / 8
-                    );
-
-                    string sqlAddAuth = "INSERT INTO TutorialAppSchema.Auth (Email, PasswordHash, PasswordSalt) VALUES ('" + registrationDto.Email + "', @PasswordHash, @PasswordSalt)";
+                    string sqlAddAuth = @"INSERT INTO TutorialAppSchema.Auth (Email, PasswordHash, PasswordSalt) VALUES ('" + registrationDto.Email + "', @PasswordHash, @PasswordSalt)";
 
                     List<SqlParameter> sqlParameters = new List<SqlParameter>();
 
@@ -81,21 +73,42 @@ namespace Api_Tutorial.Controllers
         [HttpPost("login")]
         public IActionResult Login(LoginDto loginDto)
         {
-            User user = _dapper.GetUserByEmail(loginDto.Email);
+            string sqlForHashAndSalt = @"SELECT [PasswordHash], [PasswordSalt] FROM TutorialAppSchema.Auth WHERE Email = '" + loginDto.Email + "'";
 
-            if (user == null)
+            LoginConfirmationDto loginConfirmationDto = _dapper.LoadSingleData<LoginConfirmationDto>(sqlForHashAndSalt);
+
+            if (loginConfirmationDto != null)
             {
-                return BadRequest(new { message = "Invalid credentials" });
+                byte[] passwordHash = GetPasswordHash(loginDto.Password, loginConfirmationDto.PasswordSalt);
+
+                // if (loginConfirmationDto.PasswordHash.SequenceEqual(passwordHash))
+
+                for (int index = 0; index < passwordHash.Length; index++)
+                {
+                    if (passwordHash[index] != loginConfirmationDto.PasswordHash[index])
+                    {
+                        return BadRequest(new { message = "Login failed" });
+                    }
+                }
+
+                return Ok(new { message = "Login successful" });
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
-            {
-                return BadRequest(new { message = "Invalid credentials" });
-            }
+            return BadRequest(new { message = "Login failed" });
+        }
 
-            string token = GenerateJwtToken(user);
+        private byte[] GetPasswordHash(string password, byte[] passwordSalt)
+        {
 
-            return Ok(new { token });
+            string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value + Convert.ToBase64String(passwordSalt);
+
+            return KeyDerivation.Pbkdf2(
+                password: password,
+                salt: Encoding.ASCII.GetBytes(passwordSaltPlusString),
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8
+            );
         }
     }
 }
