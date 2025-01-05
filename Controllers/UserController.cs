@@ -152,4 +152,20 @@ public class UserController : ControllerBase
 
         throw new Exception("Failed to Add User Salary");
     }
+
+    [HttpPut("salary")]
+    public IActionResult EditUserSalary(UserSalary userSalary)
+    {
+        string sql = @"
+            UPDATE TutorialAppSchema.UserSalary
+            SET [Salary] = " + userSalary.Salary +
+            " WHERE UserId = " + userSalary.UserId;
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Update User Salary");
+    }
 }
