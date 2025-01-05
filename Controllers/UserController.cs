@@ -132,4 +132,24 @@ public class UserController : ControllerBase
 
         return userSalary;
     }
+
+    [HttpPost("salary")]
+    public IActionResult AddUserSalary(UserSalary userSalary)
+    {
+        string sql = @"
+            INSERT INTO TutorialAppSchema.UserSalary(
+                [UserId],
+                [Salary]
+            ) VALUES(
+                " + userSalary.UserId +
+                ", " + userSalary.Salary +
+            ")";
+
+        if (_dapper.ExecuteSql(sql))
+        {
+            return Ok();
+        }
+
+        throw new Exception("Failed to Add User Salary");
+    }
 }
