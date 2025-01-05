@@ -10,13 +10,10 @@ namespace Api_Tutorial.Controllers;
 [Route("[controller]")]
 public class EFUserController : ControllerBase
 {
-    EFDataContext _entityFramework;
     IUserRepository _userRepository;
     IMapper _mapper;
     public EFUserController(IConfiguration config, IUserRepository userRepository)
     {
-        _entityFramework = new EFDataContext(config);
-
         _userRepository = userRepository;
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
@@ -28,7 +25,7 @@ public class EFUserController : ControllerBase
     [HttpGet("")]
     public IEnumerable<User> GetUsers()
     {
-        IEnumerable<User> users = _entityFramework.Users.ToList<User>();
+        IEnumerable<User> users = _userRepository.GetUsers();
 
         return users;
     }
@@ -36,20 +33,13 @@ public class EFUserController : ControllerBase
     [HttpGet("{userId}")]
     public User GetUser(int userId)
     {
-        User? user = _entityFramework.Users.Where(u => u.UserId == userId).FirstOrDefault<User>();
-
-        if (user != null)
-        {
-            return user;
-        }
-
-        throw new Exception("Failed to Get User");
+        return _userRepository.GetUser(userId);
     }
 
     [HttpPut]
     public IActionResult EditUser(User user)
     {
-        User? userFromDb = _entityFramework.Users.Where(u => u.UserId == user.UserId).FirstOrDefault<User>();
+        User? userFromDb = _userRepository.GetUser(user.UserId);
 
         if (userFromDb != null)
         {
@@ -90,7 +80,7 @@ public class EFUserController : ControllerBase
     [HttpDelete("{userId}")]
     public IActionResult DeleteUser(int userId)
     {
-        User? userFromDb = _entityFramework.Users.Where(u => u.UserId == userId).FirstOrDefault<User>();
+        User? userFromDb = _userRepository.GetUser(userId);
 
         if (userFromDb != null)
         {
@@ -110,14 +100,7 @@ public class EFUserController : ControllerBase
     [HttpGet("salary/{userId}")]
     public UserSalary GetUserSalary(int userId)
     {
-        UserSalary? userSalary = _entityFramework.UserSalary.Where(u => u.UserId == userId).FirstOrDefault<UserSalary>();
-
-        if (userSalary != null)
-        {
-            return userSalary;
-        }
-
-        throw new Exception("Failed to Get User Salary");
+        return _userRepository.GetUserSalary(userId);
     }
 
     [HttpPost("salary")]
@@ -136,7 +119,7 @@ public class EFUserController : ControllerBase
     [HttpPut("salary")]
     public IActionResult EditUserSalary(UserSalary userSalary)
     {
-        UserSalary? userSalaryFromDb = _entityFramework.UserSalary.Where(u => u.UserId == userSalary.UserId).FirstOrDefault<UserSalary>();
+        UserSalary? userSalaryFromDb = _userRepository.GetUserSalary(userSalary.UserId);
 
         if (userSalaryFromDb != null)
         {
@@ -156,7 +139,7 @@ public class EFUserController : ControllerBase
     [HttpDelete("salary/{userId}")]
     public IActionResult DeleteUserSalary(int userId)
     {
-        UserSalary? userSalaryFromDb = _entityFramework.UserSalary.Where(u => u.UserId == userId).FirstOrDefault<UserSalary>();
+        UserSalary? userSalaryFromDb = _userRepository.GetUserSalary(userId);
 
         if (userSalaryFromDb != null)
         {

@@ -1,3 +1,5 @@
+using Api_Tutorial.Models;
+
 namespace Api_Tutorial.Data
 {
     public interface IUserRepository
@@ -7,5 +9,11 @@ namespace Api_Tutorial.Data
         public void AddEntity<T>(T entity);
 
         public void RemoveEntity<T>(T entity);
+
+        public IEnumerable<User> GetUsers();
+
+        public User GetUser(int userId);
+
+        public UserSalary GetUserSalary(int userId);
     }
 }
