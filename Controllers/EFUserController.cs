@@ -147,7 +147,7 @@ public class EFUserController : ControllerBase
             throw new Exception("Failed to Update User Salary");
         }
 
-        throw new Exception("Failed to Update User Salary");
+        throw new Exception("Failed to Find User Salary");
     }
 
     [HttpDelete("salary/{userId}")]
@@ -167,6 +167,6 @@ public class EFUserController : ControllerBase
             throw new Exception("Failed to Delete User Salary");
         }
 
-        throw new Exception("Failed to Delete User Salary");
+        throw new Exception("Failed to Find User Salary");
     }
 }
